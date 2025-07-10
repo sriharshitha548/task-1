@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Responsive Image Gallery</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
+    
+    .gallery-controls {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .gallery-controls button {
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      background: #333;
+      color: #fff;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .gallery img {
+      width: 100%;
+      height: auto;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: transform 0.3s ease, filter 0.3s;
+    }
+
+    .gallery img:hover {
+      transform: scale(1.05);
+      filter: brightness(0.9);
+    }
+
+    /* Lightbox styles */
+    .lightbox {
+      position: fixed;
+      display: none;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .lightbox img {
+      max-width: 90%;
+      max-height: 80%;
+      border-radius: 10px;
+    }
+
+    .lightbox button {
+      position: absolute;
+      top: 50%;
+      background: rgba(255, 255, 255, 0.7);
+      border: none;
+      font-size: 30px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transform: translateY(-50%);
+    }
+
+    .prev-btn { left: 5%; }
+    .next-btn { right: 5%; }
+    .close-btn {
+      top: 10%;
+      right: 5%;
+      font-size: 25px;
+      background: crimson;
+      color: white;
+      border-radius: 5px;
+    }
+
+    @media (max-width: 600px) {
+      .lightbox button { font-size: 20px; padding: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<h2 style="text-align:center;">Responsive Image Gallery with Lightbox & Filters</h2>
+
+<div class="gallery-controls">
+  <button onclick="filterImages('all')">All</button>
+  <button onclick="filterImages('nature')">Nature</button>
+  <button onclick="filterImages('city')">City</button>
+</div>
+
+<div class="gallery" id="gallery">
+  <img src="https://picsum.photos/id/1018/400/300" data-category="nature" alt="">
+  <img src="https://picsum.photos/id/1015/400/300" data-category="nature" alt="">
+  <img src="https://picsum.photos/id/1020/400/300" data-category="city" alt="">
+  <img src="https://picsum.photos/id/1024/400/300" data-category="nature" alt="">
+  <img src="https://picsum.photos/id/1031/400/300" data-category="city" alt="">
+  <img src="https://picsum.photos/id/1025/400/300" data-category="nature" alt="">
+</div>
+
+<div class="lightbox" id="lightbox">
+  <button class="close-btn" onclick="closeLightbox()">✖</button>
+  <button class="prev-btn" onclick="changeImage(-1)">❮</button>
+  <img id="lightbox-img" src="" alt="">
+  <button class="next-btn" onclick="changeImage(1)">❯</button>
+</div>
+
+<script>
+  const galleryImages = document.querySelectorAll('.gallery img');
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img');
+  let currentIndex = 0;
+
+  // Open Lightbox
+  galleryImages.forEach((img, index) => {
+    img.addEventListener('click', () => {
+      lightbox.style.display = 'flex';
+      lightboxImg.src = img.src;
+      currentIndex = index;
+    });
+  });
+
+  // Close Lightbox
+  function closeLightbox() {
+    lightbox.style.display = 'none';
+  }
+
+  // Next/Prev Image
+  function changeImage(direction) {
+    currentIndex += direction;
+    if (currentIndex < 0) currentIndex = galleryImages.length - 1;
+    if (currentIndex >= galleryImages.length) currentIndex = 0;
+    lightboxImg.src = galleryImages[currentIndex].src;
+  }
+
+  // Filter Images
+  function filterImages(category) {
+    galleryImages.forEach(img => {
+      const isMatch = img.getAttribute('data-category') === category || category === 'all';
+      img.style.display = isMatch ? 'block' : 'none';
+    });
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', e => {
+    if (lightbox.style.display === 'flex') {
+      if (e.key === 'ArrowRight') changeImage(1);
+      if (e.key === 'ArrowLeft') changeImage(-1);
+      if (e.key === 'Escape') closeLightbox();
+    }
+  });
+</script>
+
+</body>
+</html>
